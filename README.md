@@ -1,1 +1,0 @@
-# doctrine-function-bundle
