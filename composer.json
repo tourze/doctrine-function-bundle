@@ -11,7 +11,8 @@
     "symfony/http-kernel": "^6.4",
     "symfony/framework-bundle": "^6.4",
     "symfony/yaml": "^6.4 || ^7.1",
-    "tourze/doctrine-function-collection": "0.0.*"
+    "tourze/doctrine-function-collection": "0.0.*",
+    "doctrine/orm": "^3.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^2.1",
