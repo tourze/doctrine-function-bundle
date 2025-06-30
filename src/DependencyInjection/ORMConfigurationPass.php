@@ -54,8 +54,8 @@ class ORMConfigurationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $serviceIds = array_keys($container->findTaggedServiceIds(IdGeneratorPass::CONFIGURATION_TAG));
-        foreach ($serviceIds as $serviceId) {
+        /** @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall */
+        foreach ($container->findTaggedServiceIds(IdGeneratorPass::CONFIGURATION_TAG) as $serviceId => $tags) {
             $ormConfigDef = $container->getDefinition($serviceId);
             $ormConfigDef->addMethodCall('addCustomStringFunction', ['JSON_EXTRACT', JsonExtract::class]);
             $ormConfigDef->addMethodCall('addCustomStringFunction', ['JSON_SEARCH', JsonSearch::class]);

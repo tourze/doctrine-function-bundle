@@ -31,19 +31,20 @@ class ORMConfigurationPassCompleteTest extends TestCase
 
         // 创建一个手动的 ORMConfigurationPass 并直接手动添加函数
         $pass = new class($addedStringFunctions, $addedDatetimeFunctions, $addedNumericFunctions) extends ORMConfigurationPass {
-            private array $stringFunctions;
-            private array $datetimeFunctions;
-            private array $numericFunctions;
-
-            public function __construct(&$stringFunctions, &$datetimeFunctions, &$numericFunctions)
+            public function __construct(
+                /** @phpstan-ignore property.onlyWritten */
+                private array &$stringFunctions,
+                /** @phpstan-ignore property.onlyWritten */
+                private array &$datetimeFunctions,
+                /** @phpstan-ignore property.onlyWritten */
+                private array &$numericFunctions
+            )
             {
-                $this->stringFunctions = &$stringFunctions;
-                $this->datetimeFunctions = &$datetimeFunctions;
-                $this->numericFunctions = &$numericFunctions;
             }
 
             public function process(ContainerBuilder $container): void
             {
+                /** @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall */
                 $serviceIds = array_keys($container->findTaggedServiceIds(IdGeneratorPass::CONFIGURATION_TAG));
                 foreach ($serviceIds as $serviceId) {
                     // 手动设置函数数组，模拟真实的方法调用
