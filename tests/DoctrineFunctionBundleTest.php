@@ -1,25 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tourze\DoctrineFunctionBundle\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Tourze\DoctrineFunctionBundle\DependencyInjection\ORMConfigurationPass;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\DoctrineFunctionBundle\DoctrineFunctionBundle;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractBundleTestCase;
 
-class DoctrineFunctionBundleTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(DoctrineFunctionBundle::class)]
+#[RunTestsInSeparateProcesses]
+final class DoctrineFunctionBundleTest extends AbstractBundleTestCase
 {
-    public function testBuild(): void
-    {
-        /** @var ContainerBuilder&\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-
-        // 验证 addCompilerPass 方法会被调用，且参数是 ORMConfigurationPass 的实例
-        $container->expects($this->once())
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(ORMConfigurationPass::class));
-
-        $bundle = new DoctrineFunctionBundle();
-        $bundle->build($container);
-    }
 }

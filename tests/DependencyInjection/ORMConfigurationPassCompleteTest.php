@@ -4,22 +4,22 @@ namespace Tourze\DoctrineFunctionBundle\Tests\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
 use Doctrine\ORM\Configuration;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Tourze\DoctrineFunctionBundle\DependencyInjection\ORMConfigurationPass;
 
-class ORMConfigurationPassCompleteTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(ORMConfigurationPass::class)]
+final class ORMConfigurationPassCompleteTest extends TestCase
 {
     public function testProcessWithRealDefinition(): void
     {
         // 创建一个真实的 ContainerBuilder
         $container = new ContainerBuilder();
-
-        // 存储添加的函数
-        $addedStringFunctions = [];
-        $addedDatetimeFunctions = [];
-        $addedNumericFunctions = [];
 
         // 创建一个简化的测试方法，直接模拟 ORMConfigurationPass 的行为
         $serviceId = 'doctrine.orm.configuration';
@@ -30,22 +30,22 @@ class ORMConfigurationPassCompleteTest extends TestCase
         $definition->addTag(IdGeneratorPass::CONFIGURATION_TAG);
 
         // 创建一个手动的 ORMConfigurationPass 并直接手动添加函数
-        $pass = new class($addedStringFunctions, $addedDatetimeFunctions, $addedNumericFunctions) extends ORMConfigurationPass {
-            public function __construct(
-                /** @phpstan-ignore property.onlyWritten */
-                private array &$stringFunctions,
-                /** @phpstan-ignore property.onlyWritten */
-                private array &$datetimeFunctions,
-                /** @phpstan-ignore property.onlyWritten */
-                private array &$numericFunctions
-            )
-            {
-            }
+        $pass = new class extends ORMConfigurationPass {
+            /** @var array<string, string> */
+            private array $stringFunctions = [];
+
+            /** @var array<string, string> */
+            private array $datetimeFunctions = [];
+
+            /** @var array<string, string> */
+            private array $numericFunctions = [];
 
             public function process(ContainerBuilder $container): void
             {
-                /** @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall */
-                $serviceIds = array_keys($container->findTaggedServiceIds(IdGeneratorPass::CONFIGURATION_TAG));
+                // PHPStan ignore: Required for testing Doctrine ORM configuration pass behavior
+                // @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall
+                $taggedServices = $container->findTaggedServiceIds(IdGeneratorPass::CONFIGURATION_TAG);
+                $serviceIds = array_keys($taggedServices);
                 foreach ($serviceIds as $serviceId) {
                     // 手动设置函数数组，模拟真实的方法调用
                     $this->stringFunctions['JSON_EXTRACT'] = 'Tourze\DoctrineFunctionCollection\JsonFunction\JsonExtract';
@@ -56,6 +56,24 @@ class ORMConfigurationPassCompleteTest extends TestCase
                     parent::process($container);
                 }
             }
+
+            /** @return array<string, string> */
+            public function getStringFunctions(): array
+            {
+                return $this->stringFunctions;
+            }
+
+            /** @return array<string, string> */
+            public function getDatetimeFunctions(): array
+            {
+                return $this->datetimeFunctions;
+            }
+
+            /** @return array<string, string> */
+            public function getNumericFunctions(): array
+            {
+                return $this->numericFunctions;
+            }
         };
 
         // 添加我们自定义的编译通道
@@ -63,6 +81,11 @@ class ORMConfigurationPassCompleteTest extends TestCase
 
         // 编译容器
         $container->compile(true);
+
+        // 通过 getter 方法获取添加的函数
+        $addedStringFunctions = $pass->getStringFunctions();
+        $addedDatetimeFunctions = $pass->getDatetimeFunctions();
+        $addedNumericFunctions = $pass->getNumericFunctions();
 
         // 断言所有函数类型都有被添加
         $this->assertNotEmpty($addedStringFunctions, '字符串函数应被添加');
