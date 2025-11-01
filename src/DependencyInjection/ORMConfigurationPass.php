@@ -13,7 +13,6 @@ class ORMConfigurationPass implements CompilerPassInterface
     {
         // PHPStan ignore: This cannot be replaced with registerForAutoconfiguration() as we are not just collecting
         // services, but modifying existing Doctrine ORM configuration definitions at compile time.
-        // @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall
         $taggedServices = $container->findTaggedServiceIds(IdGeneratorPass::CONFIGURATION_TAG);
         $this->processTaggedServices($container, $taggedServices);
     }
