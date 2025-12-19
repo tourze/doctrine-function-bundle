@@ -43,7 +43,6 @@ final class ORMConfigurationPassCompleteTest extends TestCase
             public function process(ContainerBuilder $container): void
             {
                 // PHPStan ignore: Required for testing Doctrine ORM configuration pass behavior
-                // @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall
                 $taggedServices = $container->findTaggedServiceIds(IdGeneratorPass::CONFIGURATION_TAG);
                 $serviceIds = array_keys($taggedServices);
                 foreach ($serviceIds as $serviceId) {

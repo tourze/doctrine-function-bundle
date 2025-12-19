@@ -26,10 +26,7 @@ final class ORMConfigurationPassTest extends TestCase
                 parent::__construct();
             }
 
-            /**
-             * @param array $arguments
-             * @phpstan-ignore-next-line missingType.iterableValue
-             */
+            
             public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = false): static
             {
                 ++$this->callCount;
